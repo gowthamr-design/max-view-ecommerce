@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-16 sm:py-24 bg-diamond-pattern min-h-[85vh] flex items-center justify-center">
+    <div class="max-w-md sm:max-w-lg w-full mx-auto px-4 sm:px-6">
+
+        <h1 class="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal text-center mb-8 tracking-tight">
+            Sign Up
+        </h1>
+
+        <form method="POST" action="{% url 'accounts:register' %}" class="space-y-4">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-3 bg-red-50 border border-neutral-900 text-xs sm:text-sm text-red-700 rounded-none">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <!-- Username -->
+            <div>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- First Name and Last Name Grid -->
+            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <p class="text-xs text-red-600 mt-1 font-medium">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <p class="text-xs text-red-600 mt-1 font-medium">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Age -->
+            <div>
+                {{ form.age }}
+                {% if form.age.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.age.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.confirm_password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="text-right text-xs sm:text-sm text-neutral-600 pt-1 pb-2">
+                <span>Already have an account?</span>
+                <a href="{% url 'accounts:login' %}" class="font-bold text-black hover:underline ml-1">
+                    Login
+                </a>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-black hover:bg-neutral-800 text-white font-bold py-3.5 sm:py-4 text-sm sm:text-base rounded-none transition-colors shadow-none text-center block tracking-normal">
+                Register
+            </button>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

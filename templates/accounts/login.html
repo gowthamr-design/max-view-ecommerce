@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-16 sm:py-24 bg-diamond-pattern min-h-[75vh] flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto px-4 sm:px-6">
+
+        <h1 class="font-serif text-3xl sm:text-4xl text-neutral-900 font-normal text-center mb-8 tracking-tight">
+            Login
+        </h1>
+
+        <form method="POST" action="{% url 'accounts:login' %}" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+
+            {% if form.non_field_errors %}
+                <div class="p-3 bg-red-50 border border-neutral-900 text-xs sm:text-sm text-red-700 rounded-none">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <div>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <p class="text-xs text-red-600 mt-1 font-medium">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex justify-between items-center text-xs sm:text-sm text-neutral-500 pt-1 pb-2">
+                <a href="{% url 'accounts:forgot_password' %}" class="text-neutral-500 hover:text-black transition-colors">
+                    Forgot your password?
+                </a>
+                <a href="{% url 'accounts:register' %}" class="text-neutral-500 hover:text-black transition-colors">
+                    Create account
+                </a>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-black hover:bg-neutral-800 text-white font-bold py-3.5 sm:py-4 text-sm sm:text-base rounded-none transition-colors shadow-none text-center block tracking-normal">
+                Login
+            </button>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div class="flex items-center justify-between">
+        <a href="{% url 'dashboard:products_list' %}"
+           class="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-brand-orange transition-colors flex items-center gap-1">
+            ← Back to Products List
+        </a>
+    </div>
+
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-8">
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-4 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Name -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Product Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Slug -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">URL Slug (Auto-generated if empty)</label>
+                    {{ form.slug }}
+                    {% if form.slug.errors %}<p class="text-xs text-red-500 mt-1">{{ form.slug.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- SKU -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Unique SKU *</label>
+                    {{ form.sku }}
+                    {% if form.sku.errors %}<p class="text-xs text-red-500 mt-1">{{ form.sku.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Category *</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<p class="text-xs text-red-500 mt-1">{{ form.category.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Price -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Price (INR) *</label>
+                    {{ form.price }}
+                    {% if form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ form.price.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Rating (1.0 to 5.0)</label>
+                    {{ form.rating }}
+                    {% if form.rating.errors %}<p class="text-xs text-red-500 mt-1">{{ form.rating.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Stock Quantity -->
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Stock Quantity</label>
+                    {{ form.stock_quantity }}
+                    {% if form.stock_quantity.errors %}<p class="text-xs text-red-500 mt-1">{{ form.stock_quantity.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Description *</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.description.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Image URL Fallback -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Image URL (Direct link or Unsplash)</label>
+                    {{ form.image_url }}
+                    {% if form.image_url.errors %}<p class="text-xs text-red-500 mt-1">{{ form.image_url.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Direct Image File Upload -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Or Upload Image File</label>
+                    {{ form.image }}
+                    {% if form.image.errors %}<p class="text-xs text-red-500 mt-1">{{ form.image.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Trending & Active Checkboxes -->
+                <div class="flex items-center gap-3 pt-2">
+                    {{ form.is_trending }}
+                    <label for="{{ form.is_trending.id_for_label }}" class="text-xs font-bold text-neutral-800">
+                        Mark as Trending Arrival (Appears on Home Page)
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}" class="text-xs font-bold text-neutral-800">
+                        Product is Active & Visible in Shop
+                    </label>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="pt-6 border-t border-neutral-200 flex items-center justify-end gap-3">
+                <a href="{% url 'dashboard:products_list' %}"
+                   class="px-5 py-2.5 border border-neutral-300 hover:border-neutral-900 text-neutral-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-7 py-2.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+                    Save Product
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

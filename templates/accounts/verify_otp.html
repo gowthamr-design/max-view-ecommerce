@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Email — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-16 sm:py-24 bg-diamond-pattern min-h-[75vh] flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto px-4 sm:px-6">
+
+        <div class="bg-white rounded-md sm:rounded-lg shadow-md p-8 sm:p-10 border border-neutral-100">
+
+            <h1 class="font-serif text-2xl sm:text-3xl text-neutral-900 font-normal text-center mb-3 tracking-tight">
+                Verify Email
+            </h1>
+
+            <p class="text-center text-xs sm:text-sm text-neutral-600 font-normal mb-6">
+                Enter the 6-digit verification code sent to <br>
+                <strong class="text-black font-semibold">{{ email }}</strong>
+            </p>
+
+            <form method="POST" action="{% url 'accounts:verify_otp' %}" class="space-y-4">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="p-3 bg-red-50 border border-neutral-900 text-xs sm:text-sm text-red-700 rounded-none mb-4">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                {% endif %}
+
+                <div>
+                    {{ form.otp_code }}
+                    {% if form.otp_code.errors %}
+                        <p class="text-xs text-red-600 mt-1 font-medium text-center">{{ form.otp_code.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-black hover:bg-neutral-800 text-white font-bold py-3.5 sm:py-4 text-sm sm:text-base rounded-none transition-colors shadow-none text-center block tracking-normal mt-6">
+                    Verify & Activate
+                </button>
+            </form>
+
+            <div class="pt-6 mt-6 border-t border-neutral-200 text-center space-y-3">
+                <form method="POST" action="{% url 'accounts:resend_otp' %}" class="inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="text-xs sm:text-sm text-neutral-600 hover:text-black font-semibold transition-colors">
+                        Resend Verification Code
+                    </button>
+                </form>
+                <div>
+                    <a href="{% url 'accounts:login' %}" class="text-xs sm:text-sm text-neutral-500 hover:text-black transition-colors">
+                        Back to Login
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

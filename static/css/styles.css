@@ -1,0 +1,121 @@
+/* MAX VIEW Luxury Fashion E-Commerce — Modern Visual Design */
+
+/* User-Provided Background Image Applied Across All Existing Pages */
+body,
+.bg-diamond-pattern,
+.bg-diamond-pattern-dense,
+.bg-site-pattern {
+    background-color: #F8F9FA;
+    background-image: url('../images/site-background.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+
+/* Subtle Image Hover Zoom */
+.luxury-zoom-container {
+    overflow: hidden;
+}
+
+.luxury-zoom-img {
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.luxury-zoom-container:hover .luxury-zoom-img {
+    transform: scale(1.05);
+}
+
+/* Clean Modern Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F3F4F6;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #FF4B26;
+}
+
+/* Smooth horizontal carousel scrolling */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Micro-animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Global Overflow Protection */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Mobile Responsive Left-to-Right Horizontal Sliding Carousel for Cards */
+@media (max-width: 767.98px) {
+    .mobile-cards-carousel {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scroll-snap-type: x mandatory !important;
+        scroll-behavior: smooth !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 1rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 1.25rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        margin-left: -1rem !important;
+        margin-right: -1rem !important;
+    }
+
+    .mobile-cards-carousel > * {
+        flex: 0 0 72vw !important;
+        max-width: 275px !important;
+        min-width: 220px !important;
+        scroll-snap-align: start !important;
+        scroll-snap-stop: always !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    /* Elegant sleek scroll indicator for mobile carousel */
+    .mobile-cards-carousel::-webkit-scrollbar {
+        height: 3px !important;
+        display: block !important;
+    }
+    .mobile-cards-carousel::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.06) !important;
+        border-radius: 9999px !important;
+        margin: 0 1rem !important;
+    }
+    .mobile-cards-carousel::-webkit-scrollbar-thumb {
+        background: #FF4B26 !important;
+        border-radius: 9999px !important;
+    }
+}
+

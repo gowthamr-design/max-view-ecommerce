@@ -1,0 +1,81 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Manage Categories — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Catalog Categories{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-5xl mx-auto">
+
+    <!-- Top Action Bar -->
+    <div class="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs flex items-center justify-between">
+        <div>
+            <h2 class="text-sm font-extrabold text-neutral-900 uppercase tracking-wider">All Fashion Collections</h2>
+            <p class="text-xs text-neutral-500 mt-0.5">Control category grouping, display orders, and storefront appearance.</p>
+        </div>
+
+        <a href="{% url 'dashboard:category_create' %}"
+           class="px-5 py-2.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 shadow-xs">
+            <span>+ Add New Category</span>
+        </a>
+    </div>
+
+    <!-- Categories Table -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-5">Order</th>
+                        <th class="py-3 px-5">Category Name</th>
+                        <th class="py-3 px-5">Slug</th>
+                        <th class="py-3 px-5">Products Count</th>
+                        <th class="py-3 px-5">Status</th>
+                        <th class="py-3 px-5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                    {% for cat in categories %}
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-4 px-5 font-bold text-neutral-400">#{{ cat.display_order }}</td>
+                            <td class="py-4 px-5 font-bold text-neutral-900 text-sm">{{ cat.name }}</td>
+                            <td class="py-4 px-5 font-mono text-neutral-500">{{ cat.slug }}</td>
+                            <td class="py-4 px-5 font-bold text-brand-orange">{{ cat.product_count }} items</td>
+                            <td class="py-4 px-5">
+                                {% if cat.is_active %}
+                                    <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Active</span>
+                                {% else %}
+                                    <span class="px-2.5 py-0.5 bg-neutral-100 text-neutral-500 text-[10px] font-bold rounded-full">Hidden</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-5 text-right">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="{% url 'dashboard:category_update' pk=cat.pk %}"
+                                       class="px-3 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{% url 'dashboard:category_delete' pk=cat.pk %}"
+                                          onsubmit="return confirm('Delete category {{ cat.name }}?');" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-3 py-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-neutral-400">
+                                No categories defined.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

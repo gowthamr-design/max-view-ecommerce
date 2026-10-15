@@ -1,0 +1,116 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Customer Orders — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Customer Orders & Fulfillment{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-7xl mx-auto">
+
+    <!-- Status Filters Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-neutral-200 shadow-xs flex flex-wrap items-center gap-2">
+        <a href="{% url 'dashboard:orders_list' %}"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'all' %}bg-neutral-900 text-white shadow-xs{% else %}text-neutral-600 hover:bg-neutral-100{% endif %}">
+            All ({{ status_counts.all }})
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}?status=pending"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'pending' %}bg-amber-500 text-white shadow-xs{% else %}text-amber-700 bg-amber-50 hover:bg-amber-100{% endif %}">
+            Pending ({{ status_counts.pending }})
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}?status=processing"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'processing' %}bg-blue-600 text-white shadow-xs{% else %}text-blue-700 bg-blue-50 hover:bg-blue-100{% endif %}">
+            Processing ({{ status_counts.processing }})
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}?status=shipped"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'shipped' %}bg-purple-600 text-white shadow-xs{% else %}text-purple-700 bg-purple-50 hover:bg-purple-100{% endif %}">
+            Shipped ({{ status_counts.shipped }})
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}?status=delivered"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'delivered' %}bg-emerald-600 text-white shadow-xs{% else %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100{% endif %}">
+            Delivered ({{ status_counts.delivered }})
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}?status=cancelled"
+           class="px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors
+           {% if current_status == 'cancelled' %}bg-red-600 text-white shadow-xs{% else %}text-red-700 bg-red-50 hover:bg-red-100{% endif %}">
+            Cancelled ({{ status_counts.cancelled }})
+        </a>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Order #</th>
+                        <th class="py-3 px-4">Customer</th>
+                        <th class="py-3 px-4">Phone / City</th>
+                        <th class="py-3 px-4">Items</th>
+                        <th class="py-3 px-4">Grand Total</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Placed Date</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                    {% for order in orders %}
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-3.5 px-4 font-mono font-bold text-neutral-900">{{ order.order_number }}</td>
+                            <td class="py-3.5 px-4">
+                                <div class="font-bold text-neutral-900">{{ order.full_name }}</div>
+                                <div class="text-[11px] text-neutral-400">@{{ order.user.username }}</div>
+                            </td>
+                            <td class="py-3.5 px-4 text-neutral-600">
+                                <div>{{ order.phone }}</div>
+                                <div class="text-[11px] text-neutral-400">{{ order.city }}</div>
+                            </td>
+                            <td class="py-3.5 px-4 font-semibold text-neutral-700">{{ order.total_items }} pcs</td>
+                            <td class="py-3.5 px-4 font-bold text-brand-orange text-sm">₹{{ order.grand_total|floatformat:2 }}</td>
+                            <td class="py-3.5 px-4">
+                                <span class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full
+                                    {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                                    {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                                    {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                                    {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                                    {% else %}bg-red-50 text-red-600 border border-red-200{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 text-neutral-500 text-[11px]">{{ order.created_at|date:"M d, Y H:i" }}</td>
+                            <td class="py-3.5 px-4 text-right">
+                                <div class="inline-flex items-center gap-1.5">
+                                    <a href="{% url 'dashboard:order_detail' pk=order.pk %}"
+                                       class="px-3 py-1.5 bg-neutral-900 hover:bg-brand-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors shadow-xs">
+                                        Manage
+                                    </a>
+                                    <form method="POST" action="{% url 'dashboard:order_delete' pk=order.pk %}"
+                                          onsubmit="return confirm('Permanently delete order #{{ order.order_number }}?');" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-2 py-1.5 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-[10px] font-bold uppercase rounded-md transition-colors"
+                                                title="Delete Order">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="py-12 text-center text-neutral-400">
+                                No orders matching status "{{ current_status }}".
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

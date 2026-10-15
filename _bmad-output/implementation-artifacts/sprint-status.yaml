@@ -1,0 +1,58 @@
+generated: 10-14-2026 09:58
+last_updated: 10-14-2026 11:10
+project: MAX VIEW
+project_key: MAXVIEW
+tracking_system: file-system
+story_location: "_bmad-output/user-stories"
+
+development_status:
+  epic-1: done
+  1-1-django-project-initialization: done
+  1-2-tailwind-css-pipeline: done
+  1-3-master-base-template-navbar: done
+  1-4-footer-benefits-grid: done
+  epic-1-retrospective: optional
+
+  epic-2: done
+  2-1-catalog-models-migrations: done
+  2-2-django-admin-seed-fixtures: done
+  2-3-reusable-product-card: done
+  epic-2-retrospective: optional
+
+  epic-3: done
+  3-1-home-page-hero-sale-badge: done
+  3-2-trending-arrivals-grid: done
+  3-3-site-configuration-context: done
+  epic-3-retrospective: optional
+
+  epic-4: done
+  4-1-category-view-filtering: done
+  4-2-lookbook-slider-touch-swipe: done
+  epic-4-retrospective: optional
+
+  epic-5: done
+  5-1-keyword-search-engine: done
+  5-2-empty-search-state: done
+  epic-5-retrospective: optional
+
+  epic-6: done
+  6-1-session-cart-engine-add-to-cart: done
+  6-2-cart-detail-quantity-subtotals: done
+  6-3-cart-item-removal-badge-update: done
+  6-4-mock-checkout-preview: done
+  epic-6-retrospective: optional
+
+  epic-7: done
+  7-1-user-registration-password-policy: done
+  7-2-customer-login-logout-navbar: done
+  7-3-cart-synchronization-on-auth: done
+  epic-7-retrospective: optional
+
+  epic-8: done
+  8-1-about-us-page-brand-heritage: done
+  8-2-contact-us-careers-anchor: done
+  8-3-contact-ingestion-form-mysql: done
+  8-4-newsletter-subscription-ingestion: done
+  epic-8-retrospective: optional
+
+action_items: []

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Bag — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-12 bg-diamond-pattern min-h-[70vh]">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="border-b border-neutral-200 pb-6 mb-10">
+            <span class="text-brand-orange text-xs uppercase tracking-[0.25em] font-bold block mb-1">Your Order</span>
+            <h1 class="font-sans text-3xl sm:text-4xl text-neutral-900 font-extrabold tracking-tight">Shopping Bag</h1>
+        </div>
+
+        {% if items %}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                
+                <!-- Cart Items List (Left 8 Cols) -->
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="hidden sm:grid grid-cols-12 gap-4 pb-3 border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+                        <div class="col-span-6">Product</div>
+                        <div class="col-span-2 text-center">Unit Price</div>
+                        <div class="col-span-2 text-center">Quantity</div>
+                        <div class="col-span-2 text-right">Subtotal</div>
+                    </div>
+
+                    {% for item in items %}
+                        <div class="flex flex-col sm:grid sm:grid-cols-12 gap-4 p-5 bg-white border border-neutral-200/90 rounded-2xl shadow-sm items-center">
+                            
+                            <!-- Product Image & Title -->
+                            <div class="col-span-6 flex items-center space-x-4 w-full">
+                                <a href="{{ item.product.get_absolute_url }}" class="w-20 aspect-[3/4] bg-neutral-100 rounded-xl overflow-hidden flex-shrink-0 border border-neutral-200">
+                                    <img src="{{ item.product.display_image }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                                </a>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] uppercase tracking-wider text-brand-orange font-bold block">{{ item.product.category.name }}</span>
+                                    <h3 class="font-sans text-sm sm:text-base text-neutral-900 font-bold hover:text-brand-orange transition-colors truncate">
+                                        <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                    </h3>
+                                    <span class="text-[11px] text-neutral-400 block mt-0.5">SKU: {{ item.product.sku }}</span>
+                                    
+                                    <!-- Remove Button Form (Mobile / Desktop) -->
+                                    <form action="{% url 'cart:cart_remove' product_id=item.product.id %}" method="POST" class="mt-2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium uppercase tracking-wider transition-colors inline-flex items-center gap-1">
+                                            <span>✕</span> Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Unit Price -->
+                            <div class="col-span-2 text-center text-sm text-neutral-700 font-semibold">
+                                <span class="sm:hidden text-xs text-neutral-500 mr-2">Unit:</span>
+                                ₹{{ item.price|floatformat:2 }}
+                            </div>
+
+                            <!-- Quantity Stepper Form -->
+                            <div class="col-span-2 flex items-center justify-center">
+                                <form action="{% url 'cart:cart_update' product_id=item.product.id %}" method="POST" class="flex items-center border border-neutral-300 bg-neutral-50 rounded-lg shadow-xs">
+                                    {% csrf_token %}
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}"
+                                            class="px-2.5 py-1 text-xs text-neutral-600 hover:text-neutral-900 font-bold" {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
+                                    <span class="w-8 text-center text-xs text-neutral-900 font-bold">{{ item.quantity }}</span>
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}"
+                                            class="px-2.5 py-1 text-xs text-neutral-600 hover:text-neutral-900 font-bold">+</button>
+                                </form>
+                            </div>
+
+                            <!-- Line Item Subtotal -->
+                            <div class="col-span-2 text-right text-sm font-bold text-neutral-900">
+                                <span class="sm:hidden text-xs text-neutral-500 mr-2">Line Total:</span>
+                                ₹{{ item.total_price|floatformat:2 }}
+                            </div>
+
+                        </div>
+                    {% endfor %}
+
+                    <div class="pt-4 flex justify-between items-center text-xs text-neutral-500">
+                        <a href="{% url 'catalog:category_list' %}" class="inline-flex items-center gap-1 text-brand-orange hover:underline uppercase tracking-wider font-bold">
+                            ← Continue Shopping
+                        </a>
+                        <span>Prices verified against live catalog database</span>
+                    </div>
+                </div>
+
+                <!-- Order Summary Breakdown (Right 4 Cols) -->
+                <div class="lg:col-span-4 bg-neutral-50/80 p-6 sm:p-8 border border-neutral-200 rounded-2xl shadow-sm space-y-6">
+                    <h2 class="font-sans text-base uppercase tracking-wider text-neutral-900 font-extrabold border-b border-neutral-200 pb-3">
+                        Summary
+                    </h2>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between text-neutral-600">
+                            <span>Bag Subtotal</span>
+                            <span class="font-bold text-neutral-900">₹{{ subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between text-neutral-600">
+                            <span>Estimated Shipping</span>
+                            {% if shipping == 0 %}
+                                <span class="font-bold text-emerald-600 uppercase tracking-wider">Complimentary</span>
+                            {% else %}
+                                <span class="font-bold text-neutral-900">₹{{ shipping|floatformat:2 }}</span>
+                            {% endif %}
+                        </div>
+                        {% if shipping > 0 %}
+                            <p class="text-[10px] text-brand-orange italic font-medium">
+                                Add ₹{{ 999.00|add:'-subtotal'|floatformat:2 }} more for free delivery.
+                            </p>
+                        {% endif %}
+                        <div class="border-t border-neutral-200 pt-3 flex justify-between text-sm font-bold text-neutral-900">
+                            <span>Grand Total</span>
+                            <span class="font-sans text-xl text-brand-orange font-extrabold">₹{{ grand_total|floatformat:2 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <a href="{% url 'cart:checkout' %}"
+                       class="block w-full py-4 text-center bg-neutral-900 hover:bg-brand-orange text-white font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
+                        Proceed to Checkout
+                    </a>
+
+                    <!-- Security note -->
+                    <div class="pt-4 border-t border-neutral-200 text-[11px] text-neutral-500 space-y-2">
+                        <p class="flex items-center gap-2">
+                            <span class="text-brand-orange">🔒</span> Secure 256-bit encrypted demonstration checkout.
+                        </p>
+                        <p>No real charges will be levied. Safe and certified.</p>
+                    </div>
+                </div>
+
+            </div>
+        {% else %}
+            <!-- Empty Cart State -->
+            <div class="text-center py-24 bg-neutral-50 border border-neutral-200 rounded-2xl max-w-2xl mx-auto p-8">
+                <div class="w-16 h-16 rounded-full bg-white border border-neutral-200 text-brand-orange mx-auto flex items-center justify-center text-2xl mb-4 shadow-xs">
+                    👜
+                </div>
+                <h2 class="font-sans text-2xl text-neutral-900 font-extrabold">Your Shopping Bag is Empty</h2>
+                <p class="text-xs text-neutral-500 mt-2 max-w-md mx-auto">
+                    You have not selected any couture garments yet. Explore our latest runway arrivals to find pieces tailored for you.
+                </p>
+                <div class="mt-6">
+                    <a href="{% url 'catalog:category_list' %}"
+                       class="inline-block px-8 py-3.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs uppercase tracking-[0.2em] font-bold rounded-lg transition-colors shadow-sm">
+                        Explore Collections
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

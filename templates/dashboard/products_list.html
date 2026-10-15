@@ -1,0 +1,119 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Manage Products — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Products Catalog Management{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-7xl mx-auto">
+
+    <!-- Header Actions & Search Filter -->
+    <div class="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Search & Category Filter Form -->
+        <form method="GET" action="{% url 'dashboard:products_list' %}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div class="relative flex-grow sm:flex-grow-0 sm:w-64">
+                <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search name, SKU, keywords..."
+                       class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-300 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-orange">
+            </div>
+
+            <select name="category" onchange="this.form.submit()"
+                    class="px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-lg text-xs text-neutral-900 font-semibold focus:outline-none focus:border-brand-orange">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="px-4 py-2 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors">
+                Filter
+            </button>
+            {% if query or selected_category %}
+                <a href="{% url 'dashboard:products_list' %}" class="text-xs text-neutral-500 hover:text-red-500 font-bold ml-1">Clear</a>
+            {% endif %}
+        </form>
+
+        <!-- Add Product CTA -->
+        <a href="{% url 'dashboard:product_create' %}"
+           class="w-full md:w-auto px-5 py-2.5 bg-brand-orange hover:bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs">
+            <span>+ Add New Product</span>
+        </a>
+
+    </div>
+
+    <!-- Products Table -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Item</th>
+                        <th class="py-3 px-4">Category</th>
+                        <th class="py-3 px-4">SKU</th>
+                        <th class="py-3 px-4">Price</th>
+                        <th class="py-3 px-4">Stock</th>
+                        <th class="py-3 px-4">Trending</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                    {% for p in products %}
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ p.display_image }}" class="w-10 h-12 object-cover rounded-md border border-neutral-200 bg-neutral-100 flex-shrink-0">
+                                    <div class="max-w-xs truncate font-bold text-neutral-900">{{ p.name }}</div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 font-semibold text-neutral-600">{{ p.category.name }}</td>
+                            <td class="py-3 px-4 font-mono text-neutral-500">{{ p.sku }}</td>
+                            <td class="py-3 px-4 font-bold text-emerald-600">₹{{ p.price|floatformat:2 }}</td>
+                            <td class="py-3 px-4 font-semibold {% if p.stock_quantity < 5 %}text-red-500{% else %}text-neutral-700{% endif %}">
+                                {{ p.stock_quantity }}
+                            </td>
+                            <td class="py-3 px-4">
+                                {% if p.is_trending %}
+                                    <span class="px-2 py-0.5 bg-brand-orange text-white text-[9px] font-extrabold uppercase rounded-full">Trending</span>
+                                {% else %}
+                                    <span class="text-neutral-400">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4">
+                                {% if p.is_active %}
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Active</span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-neutral-100 text-neutral-500 text-[10px] font-bold rounded-full">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="{% url 'dashboard:product_update' pk=p.pk %}"
+                                       class="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{% url 'dashboard:product_delete' pk=p.pk %}"
+                                          onsubmit="return confirm('Permanently remove product {{ p.name }}?');" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-2.5 py-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="py-12 text-center text-neutral-400">
+                                No products found matching criteria.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

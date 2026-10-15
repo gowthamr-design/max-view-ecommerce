@@ -1,0 +1,192 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Executive Overview — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Executive Overview{% endblock %}
+
+{% block content %}
+<div class="space-y-8 max-w-7xl mx-auto">
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <!-- Total Revenue -->
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-xs space-y-2">
+            <span class="text-[11px] uppercase tracking-wider text-neutral-400 font-bold">Total Gross Revenue</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-brand-orange font-sans">₹{{ total_revenue|floatformat:2 }}</span>
+                <span class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Active</span>
+            </div>
+            <p class="text-[11px] text-neutral-500">Excludes cancelled orders</p>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-xs space-y-2">
+            <span class="text-[11px] uppercase tracking-wider text-neutral-400 font-bold">Customer Orders</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-neutral-900 font-sans">{{ total_orders }}</span>
+                {% if pending_orders_count > 0 %}
+                    <span class="text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full">{{ pending_orders_count }} Pending</span>
+                {% else %}
+                    <span class="text-xs bg-neutral-100 text-neutral-600 font-bold px-2 py-0.5 rounded-full">Up to date</span>
+                {% endif %}
+            </div>
+            <p class="text-[11px] text-neutral-500"><a href="{% url 'dashboard:orders_list' %}" class="text-brand-orange hover:underline font-semibold">View all orders →</a></p>
+        </div>
+
+        <!-- Products in Catalog -->
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-xs space-y-2">
+            <span class="text-[11px] uppercase tracking-wider text-neutral-400 font-bold">Catalog Products</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-neutral-900 font-sans">{{ total_products }}</span>
+                <span class="text-xs text-neutral-500 font-semibold">{{ total_categories }} Categories</span>
+            </div>
+            <p class="text-[11px] text-neutral-500"><a href="{% url 'dashboard:products_list' %}" class="text-brand-orange hover:underline font-semibold">Manage products →</a></p>
+        </div>
+
+        <!-- Registered Customers -->
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-xs space-y-2">
+            <span class="text-[11px] uppercase tracking-wider text-neutral-400 font-bold">Client Accounts</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-neutral-900 font-sans">{{ total_customers }}</span>
+                <span class="text-xs bg-orange-50 text-brand-orange font-bold px-2 py-0.5 rounded-full">Members</span>
+            </div>
+            <p class="text-[11px] text-neutral-500"><a href="{% url 'dashboard:customers_list' %}" class="text-brand-orange hover:underline font-semibold">View customer list →</a></p>
+        </div>
+
+    </div>
+
+    <!-- Quick Management Action Buttons -->
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'dashboard:product_create' %}"
+           class="px-5 py-2.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 shadow-xs">
+            <span>+ Add Product</span>
+        </a>
+        <a href="{% url 'dashboard:category_create' %}"
+           class="px-5 py-2.5 bg-white border border-neutral-300 hover:border-neutral-900 text-neutral-800 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+            <span>+ Add Category</span>
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}"
+           class="px-5 py-2.5 bg-white border border-neutral-300 hover:border-brand-orange text-neutral-800 hover:text-brand-orange text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+            <span>Manage Orders</span>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Recent Orders Table (8 cols) -->
+        <div class="lg:col-span-8 bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+            <div class="p-6 border-b border-neutral-200 flex items-center justify-between">
+                <h2 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Recent Customer Orders</h2>
+                <a href="{% url 'dashboard:orders_list' %}" class="text-xs font-bold text-brand-orange hover:underline uppercase tracking-wider">View All</a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                        <tr>
+                            <th class="py-3 px-4">Order #</th>
+                            <th class="py-3 px-4">Customer</th>
+                            <th class="py-3 px-4">Items</th>
+                            <th class="py-3 px-4">Total</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100">
+                        {% for order in recent_orders %}
+                            <tr class="hover:bg-neutral-50/50 transition-colors">
+                                <td class="py-3.5 px-4 font-mono font-bold text-neutral-900">{{ order.order_number }}</td>
+                                <td class="py-3.5 px-4">
+                                    <div class="font-bold text-neutral-900">{{ order.full_name }}</div>
+                                    <div class="text-[11px] text-neutral-400">{{ order.created_at|date:"M d, Y H:i" }}</div>
+                                </td>
+                                <td class="py-3.5 px-4 font-semibold text-neutral-700">{{ order.total_items }} pcs</td>
+                                <td class="py-3.5 px-4 font-bold text-neutral-900">₹{{ order.grand_total|floatformat:2 }}</td>
+                                <td class="py-3.5 px-4">
+                                    <span class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full
+                                        {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                                        {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                                        {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                                        {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                                        {% else %}bg-neutral-100 text-neutral-600{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-4 text-right">
+                                    <a href="{% url 'dashboard:order_detail' pk=order.pk %}"
+                                       class="px-3 py-1 bg-neutral-900 hover:bg-brand-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="py-12 text-center text-neutral-400">
+                                    No customer orders received yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Customer Signups & Inquiries (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Recent Customers -->
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900">Latest Clients</h3>
+                    <a href="{% url 'dashboard:customers_list' %}" class="text-[10px] font-bold text-brand-orange hover:underline uppercase">All</a>
+                </div>
+
+                <div class="divide-y divide-neutral-100">
+                    {% for c in recent_customers %}
+                        <div class="py-2.5 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-xs text-neutral-800">
+                                    {{ c.username|make_list|first|upper }}
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-neutral-900">{{ c.get_full_name|default:c.username }}</h4>
+                                    <p class="text-[10px] text-neutral-400">{{ c.email|default:"No email" }}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-neutral-400">{{ c.date_joined|date:"M d" }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-neutral-400 py-4 text-center">No customers yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Inquiries / Messages -->
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-neutral-200 pb-3">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900">Pending Inquiries</h3>
+                    <a href="{% url 'dashboard:content_management' %}" class="text-[10px] font-bold text-brand-orange hover:underline uppercase">Manage</a>
+                </div>
+
+                <div class="divide-y divide-neutral-100">
+                    {% for msg in recent_inquiries %}
+                        <div class="py-2.5 space-y-1">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-neutral-900">{{ msg.name }}</span>
+                                <span class="text-[10px] text-neutral-400">{{ msg.created_at|date:"M d" }}</span>
+                            </div>
+                            <p class="text-[11px] text-neutral-600 line-clamp-1">{{ msg.subject }}: {{ msg.message }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-neutral-400 py-4 text-center">All messages resolved.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Client Profile — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-diamond-pattern min-h-[75vh]">
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="border-b border-neutral-200 pb-6 mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-brand-orange text-xs uppercase tracking-[0.25em] font-bold block mb-1">Couture Membership</span>
+                <h1 class="font-sans text-3xl font-extrabold text-neutral-900 tracking-tight">Client Account</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'dashboard:home' %}"
+                       class="px-4 py-2 bg-neutral-900 hover:bg-brand-orange text-white text-xs uppercase tracking-wider font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>Admin Dashboard</span>
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'accounts:logout' %}" class="px-4 py-2 border border-neutral-300 text-red-500 hover:border-red-500 hover:bg-red-50 text-xs uppercase tracking-wider font-bold rounded-lg transition-colors">
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: User Summary Card (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <div class="bg-white p-6 border border-neutral-200 rounded-2xl shadow-xs space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full bg-orange-50 border-2 border-brand-orange text-brand-orange flex items-center justify-center font-sans text-2xl font-bold shadow-xs">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-sans text-lg font-bold text-neutral-900">{{ user.get_full_name|default:user.username }}</h2>
+                            <p class="text-xs text-neutral-500 font-mono">@{{ user.username }}</p>
+                            <span class="inline-block mt-1 px-2 py-0.5 bg-neutral-100 text-neutral-700 text-[10px] font-bold uppercase rounded-sm">
+                                {% if user.is_staff or user.is_superuser %}Administrator{% else %}VIP Client{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-neutral-100 space-y-2 text-xs text-neutral-600">
+                        <p><strong class="text-neutral-900">Email:</strong> {{ user.email }}</p>
+                        <p><strong class="text-neutral-900">Telephone:</strong> {{ profile.phone|default:"Not specified" }}</p>
+                        <p><strong class="text-neutral-900">Client Since:</strong> {{ user.date_joined|date:"F Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Bag Quick Overview -->
+                <div class="bg-white p-6 border border-neutral-200 rounded-2xl shadow-xs space-y-3 text-xs">
+                    <h3 class="font-sans uppercase tracking-wider text-neutral-900 font-bold border-b border-neutral-200 pb-2">
+                        Active Shopping Bag
+                    </h3>
+                    <div class="flex justify-between py-1">
+                        <span class="text-neutral-600">Items:</span>
+                        <span class="font-bold text-neutral-900">{{ cart_item_count|default:0 }}</span>
+                    </div>
+                    <a href="{% url 'cart:cart_detail' %}" class="block text-center py-2.5 bg-neutral-900 hover:bg-brand-orange text-white font-bold uppercase tracking-wider rounded-lg transition-colors">
+                        View Shopping Bag
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Personal Information Edit Form & Order History (8 cols) -->
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- 1. Edit Personal Information -->
+                <div class="bg-white p-6 sm:p-8 border border-neutral-200 rounded-2xl shadow-xs space-y-6">
+                    <div class="border-b border-neutral-200 pb-3">
+                        <h2 class="font-sans text-base uppercase tracking-wider text-neutral-900 font-extrabold">
+                            Update Personal Details
+                        </h2>
+                        <p class="text-xs text-neutral-500 mt-0.5">Manage your shipping address, contact phone, and name.</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'accounts:profile' %}" class="space-y-4">
+                        {% csrf_token %}
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">Email Address *</label>
+                                {{ form.email }}
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">Telephone Contact</label>
+                                {{ form.phone }}
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">Postal PIN Code</label>
+                                {{ form.postal_code }}
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">Street Address</label>
+                                {{ form.address_line1 }}
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">City</label>
+                                {{ form.city }}
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1">State / Province</label>
+                                {{ form.state }}
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end">
+                            <button type="submit"
+                                    class="px-6 py-2.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 2. Order History -->
+                <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+                    <div class="p-6 border-b border-neutral-200 flex items-center justify-between">
+                        <div>
+                            <h2 class="font-sans text-base uppercase tracking-wider text-neutral-900 font-extrabold">
+                                Your Purchase History
+                            </h2>
+                            <p class="text-xs text-neutral-500 mt-0.5">Track your orders, delivery status, and purchase receipts.</p>
+                        </div>
+                        <span class="text-xs font-bold text-neutral-400 font-mono">{{ orders.count }} Total</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="py-3 px-5">Order Reference</th>
+                                    <th class="py-3 px-5">Date Placed</th>
+                                    <th class="py-3 px-5">Items</th>
+                                    <th class="py-3 px-5">Total</th>
+                                    <th class="py-3 px-5">Status</th>
+                                    <th class="py-3 px-5 text-right">Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-100">
+                                {% for order in orders %}
+                                    <tr class="hover:bg-neutral-50/50 transition-colors">
+                                        <td class="py-4 px-5 font-mono font-bold text-neutral-900">{{ order.order_number }}</td>
+                                        <td class="py-4 px-5 text-neutral-500">{{ order.created_at|date:"M d, Y" }}</td>
+                                        <td class="py-4 px-5 font-semibold text-neutral-700">{{ order.total_items }} items</td>
+                                        <td class="py-4 px-5 font-bold text-brand-orange text-sm">₹{{ order.grand_total|floatformat:2 }}</td>
+                                        <td class="py-4 px-5">
+                                            <span class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full
+                                                {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                                                {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                                                {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                                                {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                                                {% else %}bg-neutral-100 text-neutral-600{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-5 text-right">
+                                            <a href="{% url 'accounts:order_detail' pk=order.pk %}"
+                                               class="px-3 py-1 bg-neutral-900 hover:bg-brand-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors">
+                                                View Order
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="py-12 text-center text-neutral-400">
+                                            You have not placed any orders yet. Discover our latest collections today!
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

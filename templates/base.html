@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Max view. — Modern Premium Fashion{% endblock %}</title>
+    <meta name="description" content="Discover compact and premium fashion trends curated for your unique style.">
+
+    <!-- Google Fonts: Plus Jakarta Sans (Modern Geometric Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF4B26',
+                            'orange-hover': '#E03A16',
+                            dark: '#111111',
+                            charcoal: '#18181B',
+                            gray: '#4B5563',
+                            light: '#F8F9FA',
+                            border: '#E5E7EB',
+                        },
+                        // Mapped for seamless component styling
+                        luxury: {
+                            black: '#111111',
+                            charcoal: '#FFFFFF',
+                            gold: '#FF4B26',
+                            'gold-hover': '#E03A16',
+                            cream: '#18181B',
+                            white: '#FFFFFF',
+                            neutral: '#F8F9FA',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script>
+        // Scroll restoration set to manual to scroll to top on every refresh
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-diamond-pattern text-neutral-900 font-sans flex flex-col min-h-screen selection:bg-brand-orange selection:text-white antialiased">
+
+
+    <!-- Reusable Navbar Component -->
+    {% include 'components/navbar.html' %}
+
+    <!-- Flash Messages Container -->
+    {% if messages %}
+        <div class="fixed top-24 right-4 z-50 space-y-3 max-w-md w-full px-4">
+            {% for message in messages %}
+                <div class="message-toast p-4 rounded-xl border shadow-xl flex items-start justify-between text-sm animate-fade-in
+                    {% if message.tags == 'success' %}
+                        bg-white text-neutral-900 border-brand-orange/60
+                    {% elif message.tags == 'error' %}
+                        bg-red-50 text-red-900 border-red-300
+                    {% else %}
+                        bg-white text-neutral-800 border-neutral-200
+                    {% endif %}">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-brand-orange flex-shrink-0"></span>
+                        <span class="font-medium">{{ message }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-neutral-400 hover:text-neutral-700 text-lg leading-none ml-3">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Dynamic Content Block -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Reusable Footer Component -->
+    {% include 'components/footer.html' %}
+
+    <!-- Global Scripts -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

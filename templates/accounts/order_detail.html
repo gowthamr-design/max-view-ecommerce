@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} — MAX VIEW{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-diamond-pattern min-h-[75vh]">
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        <!-- Header -->
+        <div class="border-b border-neutral-200 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <a href="{% url 'accounts:profile' %}" class="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-brand-orange transition-colors flex items-center gap-1 mb-2">
+                    ← Back to My Account
+                </a>
+                <span class="text-brand-orange text-xs uppercase tracking-[0.25em] font-bold block mb-1">Order Details</span>
+                <h1 class="font-sans text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                    Order #{{ order.order_number }}
+                </h1>
+            </div>
+
+            <div class="text-left sm:text-right">
+                <span class="text-xs text-neutral-400 block mb-1">Status:</span>
+                <span class="px-3 py-1 text-xs font-bold uppercase rounded-full inline-block
+                    {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                    {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                    {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                    {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                    {% else %}bg-neutral-100 text-neutral-600{% endif %}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+            <div class="p-6 border-b border-neutral-200">
+                <h2 class="font-sans text-sm font-extrabold uppercase tracking-wider text-neutral-900">
+                    Couture Garments
+                </h2>
+            </div>
+
+            <div class="divide-y divide-neutral-100 p-6 space-y-4">
+                {% for item in order.items.all %}
+                    <div class="flex items-center justify-between pt-3 first:pt-0">
+                        <div class="flex items-center gap-4">
+                            <img src="{{ item.product.display_image }}" class="w-14 h-16 object-cover rounded-lg border border-neutral-200 bg-neutral-100 flex-shrink-0">
+                            <div>
+                                <h3 class="font-bold text-neutral-900 text-sm">{{ item.product.name }}</h3>
+                                <p class="text-xs text-neutral-500 mt-0.5">Category: {{ item.product.category.name }}</p>
+                                <p class="text-xs text-neutral-600 font-semibold mt-1">₹{{ item.price|floatformat:2 }} × {{ item.quantity }}</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-neutral-900 text-sm">₹{{ item.total_price|floatformat:2 }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Totals -->
+            <div class="bg-neutral-50/70 p-6 border-t border-neutral-200 space-y-2 text-xs">
+                <div class="flex justify-between text-neutral-600">
+                    <span>Subtotal</span>
+                    <span class="font-semibold text-neutral-900">₹{{ order.subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between text-neutral-600">
+                    <span>White Glove Shipping</span>
+                    <span class="font-semibold text-neutral-900">
+                        {% if order.shipping == 0 %}Complimentary{% else %}₹{{ order.shipping|floatformat:2 }}{% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-neutral-900 pt-3 border-t border-neutral-200">
+                    <span>Grand Total</span>
+                    <span class="font-sans text-xl text-brand-orange font-extrabold">₹{{ order.grand_total|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery & Contact Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-3 text-xs">
+                <h3 class="font-sans text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2">
+                    Shipping Recipient
+                </h3>
+                <p class="font-bold text-neutral-900">{{ order.full_name }}</p>
+                <p class="text-neutral-600">Telephone: {{ order.phone }}</p>
+                <p class="text-neutral-600">Email: {{ order.email|default:order.user.email }}</p>
+            </div>
+
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-3 text-xs">
+                <h3 class="font-sans text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2">
+                    Destination Address
+                </h3>
+                <p class="font-semibold text-neutral-900">{{ order.address }}</p>
+                <p class="text-neutral-600">{{ order.city }}, {{ order.postal_code }}</p>
+                <p class="text-[11px] text-neutral-400 mt-2">Ordered on {{ order.created_at|date:"F d, Y \a\\t H:i" }}</p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

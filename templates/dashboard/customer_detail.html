@@ -1,0 +1,144 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Client: {{ customer.username }} — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Client Profile & Activity{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-5xl mx-auto">
+
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <a href="{% url 'dashboard:customers_list' %}"
+           class="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-brand-orange transition-colors flex items-center gap-1">
+            ← Back to Customers List
+        </a>
+
+        <div class="flex items-center gap-2">
+            <form method="POST" action="{% url 'dashboard:customer_toggle_status' pk=customer.pk %}" class="inline">
+                {% csrf_token %}
+                <button type="submit"
+                        class="px-3.5 py-1.5 {% if customer.is_active %}bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 border border-amber-200{% else %}bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-700 border border-emerald-200{% endif %} text-xs font-bold uppercase rounded-lg transition-colors">
+                    {% if customer.is_active %}Suspend Account{% else %}Re-activate Account{% endif %}
+                </button>
+            </form>
+            <form method="POST" action="{% url 'dashboard:customer_delete' pk=customer.pk %}"
+                  onsubmit="return confirm('Permanently delete account @{{ customer.username }} and all associated data?');" class="inline">
+                {% csrf_token %}
+                <button type="submit"
+                        class="px-3.5 py-1.5 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-xs font-bold uppercase rounded-lg transition-colors">
+                    Delete Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Header Card -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-orange-50 border-2 border-brand-orange text-brand-orange flex items-center justify-center font-bold text-2xl font-sans flex-shrink-0">
+                {{ customer.username|make_list|first|upper }}
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-xl font-extrabold text-neutral-900">{{ customer.get_full_name|default:customer.username }}</h2>
+                    {% if customer.is_active %}
+                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Active</span>
+                    {% else %}
+                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">Suspended</span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-neutral-500 font-mono mt-0.5">@{{ customer.username }} &bull; {{ customer.email }}</p>
+                <p class="text-[11px] text-neutral-400 mt-1">Client joined: {{ customer.date_joined|date:"F d, Y" }}</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 border-t md:border-t-0 md:border-l border-neutral-200 pt-4 md:pt-0 md:pl-6 text-xs">
+            <div>
+                <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block">Lifetime Orders</span>
+                <span class="text-xl font-extrabold text-neutral-900 font-sans">{{ orders.count }}</span>
+            </div>
+            <div>
+                <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block">Lifetime Spent</span>
+                <span class="text-xl font-extrabold text-brand-orange font-sans">₹{{ total_spent|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact & Shipping Address -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4 text-xs">
+        <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-3">
+            Primary Contact & Address
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-neutral-700">
+            <div>
+                <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block mb-1">Telephone</span>
+                <p class="font-semibold">{{ customer.profile.phone|default:"No telephone saved" }}</p>
+            </div>
+            <div>
+                <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block mb-1">Delivery Address</span>
+                <p class="font-semibold">{{ customer.profile.address_line1|default:"No address saved" }}</p>
+            </div>
+            <div>
+                <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block mb-1">City & Postal PIN</span>
+                <p class="font-semibold">{{ customer.profile.city|default:"—" }}, {{ customer.profile.postal_code|default:"—" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders History -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="p-6 border-b border-neutral-200">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Orders Placed by {{ customer.username }}</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Order #</th>
+                        <th class="py-3 px-4">Date</th>
+                        <th class="py-3 px-4">Items</th>
+                        <th class="py-3 px-4">Grand Total</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                    {% for order in orders %}
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-3.5 px-4 font-mono font-bold text-neutral-900">{{ order.order_number }}</td>
+                            <td class="py-3.5 px-4 text-neutral-500">{{ order.created_at|date:"M d, Y" }}</td>
+                            <td class="py-3.5 px-4 font-semibold text-neutral-700">{{ order.total_items }} pcs</td>
+                            <td class="py-3.5 px-4 font-bold text-brand-orange">₹{{ order.grand_total|floatformat:2 }}</td>
+                            <td class="py-3.5 px-4">
+                                <span class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full
+                                    {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                                    {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                                    {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                                    {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                                    {% else %}bg-neutral-100 text-neutral-600{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 text-right">
+                                <a href="{% url 'dashboard:order_detail' pk=order.pk %}"
+                                   class="px-3 py-1 bg-neutral-900 hover:bg-brand-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md transition-colors">
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-neutral-400">
+                                This client has not placed any orders yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

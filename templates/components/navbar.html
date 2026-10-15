@@ -1,0 +1,206 @@
+{% load static %}
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-100 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+
+            <!-- Mobile Hamburger Button -->
+            <div class="flex items-center md:hidden">
+                <button type="button" id="mobile-menu-btn" class="p-2 text-neutral-800 hover:text-brand-orange focus:outline-none transition-colors" aria-label="Open Mobile Navigation">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Brand Logo (Exactly as in reference image: "Max view.") -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="{% url 'core:home' %}" class="flex items-center group">
+                    <span class="text-2xl lg:text-3xl font-extrabold tracking-tight text-neutral-900 group-hover:text-brand-orange transition-colors">
+                        Max view<span class="text-brand-orange">.</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Desktop Navigation Links (HOME, CATEGORIES, ABOUT, CONTACT, OUT) -->
+            <nav class="hidden md:flex items-center space-x-7 lg:space-x-9">
+                <a href="{% url 'core:home' %}" class="text-xs uppercase tracking-[0.18em] font-bold text-neutral-800 hover:text-brand-orange transition-colors py-2">
+                    HOME
+                </a>
+                
+                <!-- Categories with Submenu Dropdown -->
+                <div class="relative group">
+                    <button type="button" id="categories-dropdown-btn" class="text-xs uppercase tracking-[0.18em] font-bold text-neutral-800 group-hover:text-brand-orange transition-colors py-2 flex items-center gap-1 focus:outline-none" aria-haspopup="true">
+                        CATEGORIES
+                        <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="categories-dropdown-menu" class="absolute left-0 top-full w-56 bg-white border border-neutral-200 shadow-xl rounded-xl py-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        {% for cat in nav_categories %}
+                            <a href="{% url 'catalog:category_detail' slug=cat.slug %}" class="block px-4 py-2.5 text-xs uppercase tracking-wider text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 transition-colors font-medium">
+                                {{ cat.name }}
+                            </a>
+                        {% empty %}
+                            <a href="{% url 'catalog:category_detail' slug='mens-wear' %}" class="block px-4 py-2.5 text-xs uppercase tracking-wider text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">Men's Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='womens-wear' %}" class="block px-4 py-2.5 text-xs uppercase tracking-wider text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">Women's Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='kids-wear' %}" class="block px-4 py-2.5 text-xs uppercase tracking-wider text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">Kids' Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='accessories' %}" class="block px-4 py-2.5 text-xs uppercase tracking-wider text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">Accessories</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <a href="{% url 'core:about' %}" class="text-xs uppercase tracking-[0.18em] font-bold text-neutral-800 hover:text-brand-orange transition-colors py-2">
+                    ABOUT
+                </a>
+                <a href="{% url 'core:contact' %}" class="text-xs uppercase tracking-[0.18em] font-bold text-neutral-800 hover:text-brand-orange transition-colors py-2">
+                    CONTACT
+                </a>
+
+                {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'dashboard:home' %}" class="text-xs uppercase tracking-[0.18em] font-extrabold text-brand-orange hover:text-neutral-900 transition-colors py-2 flex items-center gap-1" title="Executive Admin Dashboard">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-orange"></span>
+                        ADMIN
+                    </a>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:logout' %}" class="text-xs uppercase tracking-[0.18em] font-bold text-neutral-800 hover:text-brand-orange transition-colors py-2" title="Sign Out">
+                        OUT
+                    </a>
+                {% endif %}
+            </nav>
+
+            <!-- Actions: Search Box, Search Icon, User/Auth, Cart -->
+            <div class="flex items-center space-x-3 lg:space-x-4">
+
+                <!-- Search Input Form with Magnifier Icon (Matches reference) -->
+                <form action="{% url 'core:search' %}" method="GET" class="flex items-center relative">
+                    <input type="text" name="q" placeholder="Search..." value="{{ query|default:'' }}"
+                           class="w-24 xs:w-32 sm:w-48 lg:w-56 pl-2.5 sm:pl-3 pr-7 sm:pr-8 py-1.5 bg-neutral-50 border border-neutral-300 rounded-md text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 focus:bg-white transition-all">
+                    <button type="submit" class="p-1.5 text-neutral-800 hover:text-brand-orange transition-colors -ml-7 z-10" aria-label="Search">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- User / Auth Profile Icon -->
+                {% if user.is_authenticated %}
+                    <div class="relative group">
+                        <a href="{% url 'accounts:profile' %}" class="p-1.5 text-neutral-800 hover:text-brand-orange transition-colors flex items-center gap-1" title="Account Profile">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </a>
+                        <div class="absolute right-0 top-full w-48 bg-white border border-neutral-200 shadow-xl rounded-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="px-4 py-2 border-b border-neutral-100 text-xs text-neutral-500">
+                                Signed in as <strong class="text-neutral-900 block truncate">{{ user.username }}</strong>
+                            </div>
+                            {% if user.is_staff or user.is_superuser %}
+                                <a href="{% url 'dashboard:home' %}" class="block px-4 py-2 text-xs text-brand-orange hover:bg-neutral-50 font-bold">
+                                    ★ Admin Dashboard
+                                </a>
+                                <div class="h-px bg-neutral-100 my-1"></div>
+                            {% endif %}
+                            <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-xs text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">
+                                My Profile
+                            </a>
+                            <a href="{% url 'cart:cart_detail' %}" class="block px-4 py-2 text-xs text-neutral-700 hover:text-brand-orange hover:bg-neutral-50 font-medium">
+                                My Bag ({{ cart_item_count|default:0 }})
+                            </a>
+                            <div class="h-px bg-neutral-100 my-1"></div>
+                            <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-xs text-red-600 hover:bg-neutral-50 font-semibold">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="p-1.5 text-neutral-800 hover:text-brand-orange transition-colors" title="Login / Register">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </a>
+                {% endif %}
+
+                <!-- Shopping Cart Icon (Matches reference trolley icon) -->
+                <a href="{% url 'cart:cart_detail' %}" class="relative p-1.5 text-neutral-800 hover:text-brand-orange transition-colors" title="View Cart">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <!-- Cart Counter Badge -->
+                    <span class="cart-badge absolute -top-1 -right-1 bg-brand-orange text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                        {{ cart_item_count|default:0 }}
+                    </span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Slide-out Menu Drawer -->
+    <div id="mobile-menu-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <div id="mobile-menu-drawer" class="fixed inset-y-0 left-0 max-w-xs w-full bg-white border-r border-neutral-200 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6">
+        <div>
+            <div class="flex items-center justify-between pb-6 border-b border-neutral-200">
+                <span class="text-2xl font-extrabold tracking-tight text-neutral-900">Max view<span class="text-brand-orange">.</span></span>
+                <button type="button" id="mobile-menu-close" class="p-2 text-neutral-500 hover:text-neutral-900" aria-label="Close menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <form action="{% url 'core:search' %}" method="GET" class="mt-6 mb-6">
+                <div class="relative">
+                    <input type="text" name="q" placeholder="Search..."
+                           class="w-full pl-3 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-orange">
+                    <button type="submit" class="absolute right-3 top-2.5 text-neutral-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-4">
+                <a href="{% url 'core:home' %}" class="block text-sm uppercase tracking-widest text-neutral-900 font-bold hover:text-brand-orange py-1">Home</a>
+                <div>
+                    <span class="block text-sm uppercase tracking-widest text-neutral-900 font-bold py-1">Categories</span>
+                    <div class="pl-4 space-y-2 border-l-2 border-brand-orange/40 my-2">
+                        {% for cat in nav_categories %}
+                            <a href="{% url 'catalog:category_detail' slug=cat.slug %}" class="block text-xs uppercase tracking-wider text-neutral-600 hover:text-brand-orange py-0.5 font-medium">
+                                {{ cat.name }}
+                            </a>
+                        {% empty %}
+                            <a href="{% url 'catalog:category_detail' slug='mens-wear' %}" class="block text-xs uppercase tracking-wider text-neutral-600 hover:text-brand-orange py-0.5 font-medium">Men's Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='womens-wear' %}" class="block text-xs uppercase tracking-wider text-neutral-600 hover:text-brand-orange py-0.5 font-medium">Women's Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='kids-wear' %}" class="block text-xs uppercase tracking-wider text-neutral-600 hover:text-brand-orange py-0.5 font-medium">Kids' Wear</a>
+                            <a href="{% url 'catalog:category_detail' slug='accessories' %}" class="block text-xs uppercase tracking-wider text-neutral-600 hover:text-brand-orange py-0.5 font-medium">Accessories</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <a href="{% url 'core:about' %}" class="block text-sm uppercase tracking-widest text-neutral-900 font-bold hover:text-brand-orange py-1">About Us</a>
+                <a href="{% url 'core:contact' %}" class="block text-sm uppercase tracking-widest text-neutral-900 font-bold hover:text-brand-orange py-1">Contact Us</a>
+                {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'dashboard:home' %}" class="block text-sm uppercase tracking-widest text-brand-orange font-extrabold py-1">★ Admin Dashboard</a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <!-- Mobile Drawer Bottom Auth Actions -->
+        <div class="pt-6 border-t border-neutral-200 space-y-3">
+            {% if user.is_authenticated %}
+                <div class="text-xs text-neutral-500">Signed in as <span class="text-neutral-900 font-semibold">{{ user.username }}</span></div>
+                <a href="{% url 'accounts:profile' %}" class="block w-full text-center py-2.5 border border-neutral-300 rounded-lg text-xs uppercase tracking-widest text-neutral-800 font-semibold hover:border-brand-orange">My Profile</a>
+                <a href="{% url 'accounts:logout' %}" class="block w-full text-center py-2.5 bg-neutral-100 rounded-lg text-xs uppercase tracking-widest text-red-600 font-semibold hover:bg-neutral-200">Logout</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="block w-full text-center py-2.5 bg-brand-dark hover:bg-brand-orange text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-colors">Login</a>
+                <a href="{% url 'accounts:register' %}" class="block w-full text-center py-2.5 border border-neutral-300 rounded-lg text-xs uppercase tracking-widest text-neutral-800 font-semibold hover:border-brand-orange">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</header>

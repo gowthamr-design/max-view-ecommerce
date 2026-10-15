@@ -1,0 +1,87 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto space-y-6">
+
+    <div class="flex items-center justify-between">
+        <a href="{% url 'dashboard:categories_list' %}"
+           class="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-brand-orange transition-colors flex items-center gap-1">
+            ← Back to Categories
+        </a>
+    </div>
+
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-8">
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-4 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Category Name -->
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Category Name *</label>
+                {{ form.name }}
+                {% if form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Slug -->
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">URL Slug (Auto-generated if blank)</label>
+                {{ form.slug }}
+                {% if form.slug.errors %}<p class="text-xs text-red-500 mt-1">{{ form.slug.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Display Order -->
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Display Order in Navbar (1 = First)</label>
+                {{ form.display_order }}
+                {% if form.display_order.errors %}<p class="text-xs text-red-500 mt-1">{{ form.display_order.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.description.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Image File Upload -->
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-neutral-700 font-bold mb-1.5">Category Showcase Image</label>
+                {{ form.image }}
+                {% if form.image.errors %}<p class="text-xs text-red-500 mt-1">{{ form.image.errors.0 }}</p>{% endif %}
+            </div>
+
+            <!-- Active Checkbox -->
+            <div class="flex items-center gap-3 pt-2">
+                {{ form.is_active }}
+                <label for="{{ form.is_active.id_for_label }}" class="text-xs font-bold text-neutral-800">
+                    Category is Active & Visible in Menus
+                </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="pt-6 border-t border-neutral-200 flex items-center justify-end gap-3">
+                <a href="{% url 'dashboard:categories_list' %}"
+                   class="px-5 py-2.5 border border-neutral-300 hover:border-neutral-900 text-neutral-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-7 py-2.5 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+                    Save Category
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

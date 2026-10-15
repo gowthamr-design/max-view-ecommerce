@@ -1,0 +1,81 @@
+<div class="group flex flex-col bg-white border border-neutral-200/90 rounded-sm overflow-hidden hover:border-neutral-400 transition-all duration-300 shadow-xs hover:shadow-md h-full">
+    
+    <!-- Product Image with Zoom on Hover -->
+    <a href="{% if link_to_category %}{% url 'catalog:category_detail' slug=product.category.slug %}{% else %}{{ product.get_absolute_url }}{% endif %}" class="relative block overflow-hidden aspect-square bg-neutral-100 luxury-zoom-container">
+        <img src="{{ product.display_image }}" alt="{{ product.name }}"
+             class="w-full h-full object-cover object-center luxury-zoom-img"
+             loading="lazy">
+        
+        <!-- Category & Sale / Discount Badge matching reference images -->
+        <div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+            {% if product.discount_percentage %}
+                <span class="bg-brand-orange text-white font-extrabold text-[10px] uppercase px-1.5 py-0.5 rounded-2xs shadow-xs">
+                    -{{ product.discount_percentage }}%
+                </span>
+            {% elif product.is_trending %}
+                <span class="bg-brand-orange text-white font-extrabold text-[10px] uppercase px-1.5 py-0.5 rounded-2xs shadow-xs">
+                    -15%
+                </span>
+            {% elif forloop.counter == 2 %}
+                <span class="bg-neutral-900 text-white font-extrabold text-[10px] uppercase px-1.5 py-0.5 rounded-2xs shadow-xs">
+                    NEW
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Quick View Overlay on Hover -->
+        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-3">
+            <span class="bg-neutral-900 hover:bg-brand-orange text-white text-[11px] uppercase tracking-wider px-3 py-1 font-semibold shadow-md transition-colors">
+                {% if link_to_category %}View Collection{% else %}View Details{% endif %}
+            </span>
+        </div>
+    </a>
+
+    <!-- Product Info matching reference images 1, 4, 5 -->
+    <div class="p-3 sm:p-4 flex flex-col flex-grow justify-between bg-white text-center">
+        <div>
+            <!-- Category Tag -->
+            {% if product.category %}
+                <a href="{% url 'catalog:category_detail' slug=product.category.slug %}" class="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold block mb-0.5 hover:text-brand-orange transition-colors">
+                    {{ product.category.name }}
+                </a>
+            {% endif %}
+
+            <!-- Product Title / Brand -->
+            <h3 class="font-sans text-xs sm:text-sm font-bold text-neutral-900 group-hover:text-brand-orange transition-colors truncate">
+                <a href="{% if link_to_category %}{% url 'catalog:category_detail' slug=product.category.slug %}{% else %}{{ product.get_absolute_url }}{% endif %}">
+                    {{ product.name }}
+                </a>
+            </h3>
+
+            <!-- Price in Emerald Green matching Images 4 & 5 -->
+            <div class="mt-1 flex items-center justify-center space-x-1.5">
+                <span class="text-xs sm:text-sm font-bold text-emerald-600">₹{{ product.price|floatformat:2 }}</span>
+                {% if product.original_price %}
+                    <span class="text-[10px] text-neutral-400 line-through">₹{{ product.original_price|floatformat:0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Color Metadata matching Images 4 & 5 -->
+            <p class="text-[10px] sm:text-[11px] text-neutral-500 mt-1 truncate">
+                Color: {{ product.color_name }}
+            </p>
+        </div>
+
+        <!-- Rating & Details Link (Without premature Add to Cart button on cards) -->
+        <div class="pt-2.5 mt-2 border-t border-neutral-100 flex items-center justify-between">
+            <div class="flex text-brand-orange text-[10px] tracking-tight">
+                ★ ★ ★ ★ ★
+            </div>
+            
+            <a href="{% if link_to_category %}{% url 'catalog:category_detail' slug=product.category.slug %}{% else %}{{ product.get_absolute_url }}{% endif %}"
+               class="text-[10px] font-bold text-neutral-800 hover:text-brand-orange uppercase tracking-wider transition-colors inline-flex items-center gap-0.5">
+                <span>{% if link_to_category %}Collection{% else %}Details{% endif %}</span>
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+
+    </div>
+</div>

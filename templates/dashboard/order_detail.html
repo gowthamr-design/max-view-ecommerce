@@ -1,0 +1,139 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Order Details & Fulfillment{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-5xl mx-auto">
+
+    <!-- Back Navigation & Status Pill -->
+    <div class="flex items-center justify-between">
+        <a href="{% url 'dashboard:orders_list' %}"
+           class="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-brand-orange transition-colors flex items-center gap-1">
+            ← Back to Orders List
+        </a>
+
+        <div class="flex items-center gap-3">
+            <form method="POST" action="{% url 'dashboard:order_delete' pk=order.pk %}"
+                  onsubmit="return confirm('Permanently delete order #{{ order.order_number }}?');" class="inline">
+                {% csrf_token %}
+                <button type="submit"
+                        class="px-3 py-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-xs font-bold uppercase rounded-lg transition-colors">
+                    Delete Order
+                </button>
+            </form>
+            <span class="text-xs text-neutral-500">Current Status:</span>
+            <span class="px-3 py-1 text-xs font-bold uppercase rounded-full
+                {% if order.status == 'pending' %}bg-amber-50 text-amber-700 border border-amber-200
+                {% elif order.status == 'processing' %}bg-blue-50 text-blue-700 border border-blue-200
+                {% elif order.status == 'shipped' %}bg-purple-50 text-purple-700 border border-purple-200
+                {% elif order.status == 'delivered' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                {% else %}bg-red-50 text-red-600 border border-red-200{% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Status Update Form Box -->
+    <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900">Update Order Fulfillment Status</h3>
+            <p class="text-xs text-neutral-500 mt-0.5">Changing status immediately updates the customer's purchase history.</p>
+        </div>
+
+        <form method="POST" action="{% url 'dashboard:order_detail' pk=order.pk %}" class="flex items-center gap-3">
+            {% csrf_token %}
+            {{ status_form.status }}
+            <button type="submit"
+                    class="px-5 py-2 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+                Update Status
+            </button>
+        </form>
+    </div>
+
+    <!-- Order Line Items & Customer Breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Ordered Items (8 cols) -->
+        <div class="lg:col-span-8 bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+            <div class="p-6 border-b border-neutral-200">
+                <h3 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">
+                    Order Items ({{ order.total_items }} Pieces)
+                </h3>
+            </div>
+
+            <div class="divide-y divide-neutral-100 p-6 space-y-4">
+                {% for item in order.items.all %}
+                    <div class="flex items-center justify-between pt-3 first:pt-0">
+                        <div class="flex items-center gap-4">
+                            <img src="{{ item.product.display_image }}" class="w-14 h-16 object-cover rounded-lg border border-neutral-200 bg-neutral-100 flex-shrink-0">
+                            <div>
+                                <h4 class="font-bold text-neutral-900 text-sm">{{ item.product.name }}</h4>
+                                <p class="text-xs text-neutral-500 mt-0.5">Category: {{ item.product.category.name }} | SKU: {{ item.product.sku }}</p>
+                                <p class="text-xs text-neutral-600 font-semibold mt-1">₹{{ item.price|floatformat:2 }} × {{ item.quantity }}</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-neutral-900 text-sm">₹{{ item.total_price|floatformat:2 }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="bg-neutral-50/70 p-6 border-t border-neutral-200 space-y-2 text-xs">
+                <div class="flex justify-between text-neutral-600">
+                    <span>Subtotal</span>
+                    <span class="font-semibold text-neutral-900">₹{{ order.subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between text-neutral-600">
+                    <span>Express White Glove Shipping</span>
+                    <span class="font-semibold text-neutral-900">
+                        {% if order.shipping == 0 %}Complimentary{% else %}₹{{ order.shipping|floatformat:2 }}{% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-neutral-900 pt-3 border-t border-neutral-200">
+                    <span>Grand Total</span>
+                    <span class="font-sans text-xl text-brand-orange font-extrabold">₹{{ order.grand_total|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer & Shipping Information (4 cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4 text-xs">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-3">
+                    Customer Account
+                </h3>
+
+                <div class="space-y-1.5">
+                    <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block">User Account</span>
+                    <p class="font-bold text-neutral-900 text-sm">@{{ order.user.username }}</p>
+                    <p class="text-neutral-600">{{ order.email|default:order.user.email }}</p>
+                </div>
+
+                <div class="space-y-1.5 pt-3 border-t border-neutral-100">
+                    <span class="text-neutral-400 uppercase tracking-wider text-[10px] font-bold block">Recipient Name</span>
+                    <p class="font-bold text-neutral-900">{{ order.full_name }}</p>
+                    <p class="text-neutral-600">Phone: {{ order.phone }}</p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4 text-xs">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-3">
+                    Delivery Address
+                </h3>
+
+                <div class="space-y-1 text-neutral-700 leading-relaxed">
+                    <p class="font-semibold text-neutral-900">{{ order.address }}</p>
+                    <p>{{ order.city }}, {{ order.postal_code }}</p>
+                    <p class="text-[11px] text-neutral-400 mt-2">Placed: {{ order.created_at|date:"F d, Y \a\\t H:i" }}</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

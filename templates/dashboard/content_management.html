@@ -1,0 +1,172 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Website Content Management — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Website Content Management{% endblock %}
+
+{% block content %}
+<div class="space-y-10 max-w-7xl mx-auto">
+
+    <!-- 1. Lookbook Slides Section -->
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Lookbook Carousel Slides</h2>
+                <p class="text-xs text-neutral-500 mt-0.5">Manage runway lookbook slides displayed on Category showcase pages.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Existing Slides List (8 cols) -->
+            <div class="lg:col-span-8 bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+                <div class="divide-y divide-neutral-100 p-6 space-y-4">
+                    {% for slide in slides %}
+                        <div class="flex items-center justify-between pt-3 first:pt-0 gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="{{ slide.display_image }}" class="w-16 h-12 object-cover rounded-md border border-neutral-200 bg-neutral-900 flex-shrink-0">
+                                <div>
+                                    <h4 class="font-bold text-neutral-900 text-xs">{{ slide.title }}</h4>
+                                    <p class="text-[11px] text-neutral-500 line-clamp-1">{{ slide.subtitle|default:"No subtitle" }}</p>
+                                    <p class="text-[10px] text-neutral-400 mt-0.5">Order: #{{ slide.display_order }} | Category: {{ slide.category.name|default:"General" }}</p>
+                                </div>
+                            </div>
+
+                            <form method="POST" action="{% url 'dashboard:slide_delete' pk=slide.pk %}"
+                                  onsubmit="return confirm('Remove slide {{ slide.title }}?');" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="px-2.5 py-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-neutral-400 py-6 text-center">No carousel slides found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Add Slide Form (4 cols) -->
+            <div class="lg:col-span-4 bg-white border border-neutral-200 rounded-2xl shadow-xs p-6 space-y-4">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2">
+                    + Add New Carousel Slide
+                </h3>
+
+                <form method="POST" action="{% url 'dashboard:slide_create' %}" enctype="multipart/form-data" class="space-y-3 text-xs">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block font-bold text-neutral-700 mb-1">Slide Title *</label>
+                        {{ slide_form.title }}
+                    </div>
+                    <div>
+                        <label class="block font-bold text-neutral-700 mb-1">Subtitle</label>
+                        {{ slide_form.subtitle }}
+                    </div>
+                    <div>
+                        <label class="block font-bold text-neutral-700 mb-1">Category</label>
+                        {{ slide_form.category }}
+                    </div>
+                    <div>
+                        <label class="block font-bold text-neutral-700 mb-1">Image URL</label>
+                        {{ slide_form.image_url }}
+                    </div>
+                    <div>
+                        <label class="block font-bold text-neutral-700 mb-1">Display Order</label>
+                        {{ slide_form.display_order }}
+                    </div>
+                    <div class="flex items-center gap-2 pt-2">
+                        {{ slide_form.is_active }}
+                        <label for="{{ slide_form.is_active.id_for_label }}" class="font-bold text-neutral-800">Is Active</label>
+                    </div>
+
+                    <div class="pt-3">
+                        <button type="submit"
+                                class="w-full py-2.5 bg-neutral-900 hover:bg-brand-orange text-white font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs">
+                            Add Slide
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 2. Contact Inquiries Section -->
+    <div class="space-y-4">
+        <div>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Contact Advisory Messages</h2>
+            <p class="text-xs text-neutral-500 mt-0.5">Inquiries submitted via the Contact Us storefront form.</p>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                        <tr>
+                            <th class="py-3 px-4">From</th>
+                            <th class="py-3 px-4">Subject</th>
+                            <th class="py-3 px-4">Message</th>
+                            <th class="py-3 px-4">Date</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-right">Toggle</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100">
+                        {% for msg in messages_list %}
+                            <tr class="hover:bg-neutral-50/50 transition-colors">
+                                <td class="py-3 px-4">
+                                    <div class="font-bold text-neutral-900">{{ msg.name }}</div>
+                                    <div class="text-[11px] text-neutral-400">{{ msg.email }}</div>
+                                </td>
+                                <td class="py-3 px-4 font-semibold text-neutral-800">{{ msg.subject }}</td>
+                                <td class="py-3 px-4 text-neutral-600 max-w-xs truncate">{{ msg.message }}</td>
+                                <td class="py-3 px-4 text-neutral-400 text-[11px]">{{ msg.created_at|date:"M d, H:i" }}</td>
+                                <td class="py-3 px-4">
+                                    {% if msg.is_resolved %}
+                                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-full text-[10px]">Resolved</span>
+                                    {% else %}
+                                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-bold rounded-full text-[10px]">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <form method="POST" action="{% url 'dashboard:contact_resolve' pk=msg.pk %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                            {% if msg.is_resolved %}Mark Pending{% else %}Mark Resolved{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-neutral-400">No contact messages received.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Newsletter Subscribers Section -->
+    <div class="space-y-4">
+        <div>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Newsletter Subscribers ({{ subscribers.count }})</h2>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs p-6">
+            <div class="flex flex-wrap gap-2">
+                {% for sub in subscribers %}
+                    <span class="px-3 py-1 bg-neutral-50 border border-neutral-200 text-neutral-800 text-xs font-medium rounded-full">
+                        {{ sub.email }} &bull; <span class="text-neutral-400 text-[10px]">{{ sub.subscribed_at|date:"M d" }}</span>
+                    </span>
+                {% empty %}
+                    <p class="text-xs text-neutral-400">No newsletter subscribers yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

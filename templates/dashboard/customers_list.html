@@ -1,0 +1,109 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Customer Accounts — MAX VIEW Dashboard{% endblock %}
+{% block header_title %}Registered Customer Accounts{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-7xl mx-auto">
+
+    <!-- Header Actions & Search -->
+    <div class="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-neutral-900">Clients & Members</h2>
+            <p class="text-xs text-neutral-500 mt-0.5">Manage registered client profiles, purchase history, and account activity.</p>
+        </div>
+
+        <form method="GET" action="{% url 'dashboard:customers_list' %}" class="flex items-center gap-2 w-full sm:w-auto">
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search username, email, name..."
+                   class="px-4 py-2 bg-neutral-50 border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-orange w-full sm:w-64">
+            <button type="submit" class="px-4 py-2 bg-neutral-900 hover:bg-brand-orange text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors">
+                Search
+            </button>
+            {% if query %}
+                <a href="{% url 'dashboard:customers_list' %}" class="text-xs text-neutral-500 hover:text-red-500 font-bold ml-1">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-5">Customer</th>
+                        <th class="py-3 px-5">Email Address</th>
+                        <th class="py-3 px-5">Telephone</th>
+                        <th class="py-3 px-5">Date Joined</th>
+                        <th class="py-3 px-5">Total Orders</th>
+                        <th class="py-3 px-5">Total Spent</th>
+                        <th class="py-3 px-5">Account Status</th>
+                        <th class="py-3 px-5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100">
+                    {% for c in customers %}
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-4 px-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-xs text-neutral-800 flex-shrink-0">
+                                        {{ c.username|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-neutral-900 text-sm">{{ c.get_full_name|default:c.username }}</div>
+                                        <div class="text-[10px] text-neutral-400 font-mono">@{{ c.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-5 text-neutral-700">{{ c.email|default:"—" }}</td>
+                            <td class="py-4 px-5 text-neutral-600">{{ c.profile.phone|default:"—" }}</td>
+                            <td class="py-4 px-5 text-neutral-500 text-[11px]">{{ c.date_joined|date:"M d, Y" }}</td>
+                            <td class="py-4 px-5 font-bold text-neutral-900">{{ c.orders_count }} orders</td>
+                            <td class="py-4 px-5 font-bold text-emerald-600">₹{{ c.total_spent|default:0|floatformat:2 }}</td>
+                            <td class="py-4 px-5">
+                                {% if c.is_active %}
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Active</span>
+                                {% else %}
+                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">Suspended</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-5 text-right">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="{% url 'dashboard:customer_detail' pk=c.pk %}"
+                                       class="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                        View
+                                    </a>
+                                    <form method="POST" action="{% url 'dashboard:customer_toggle_status' pk=c.pk %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-2.5 py-1 {% if c.is_active %}bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 border border-amber-200{% else %}bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-700 border border-emerald-200{% endif %} text-[10px] font-bold uppercase rounded-md transition-colors"
+                                                title="{% if c.is_active %}Suspend account{% else %}Re-activate account{% endif %}">
+                                            {% if c.is_active %}Suspend{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{% url 'dashboard:customer_delete' pk=c.pk %}"
+                                          onsubmit="return confirm('Permanently delete account @{{ c.username }}?');" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-2 py-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 text-[10px] font-bold uppercase rounded-md transition-colors">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="py-12 text-center text-neutral-400">
+                                No customer accounts found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

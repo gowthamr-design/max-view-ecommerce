@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MAX VIEW — Online Shopping & Premium Fashion{% endblock %}
+
+{% block content %}
+<!-- PAGE 1 — HERO SECTION MATCHING REFERENCE IMAGE -->
+<section class="relative bg-diamond-pattern pt-12 pb-16 lg:pt-16 lg:pb-20 border-b border-neutral-200/60 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+
+            <!-- Hero Left Side: Brand Statement & CTA matching Image 1 -->
+            <div class="lg:col-span-5 space-y-6 text-center lg:text-left">
+                <!-- Eyebrow: SEASON 2026 -->
+                <div>
+                    <span class="inline-block text-xs uppercase tracking-[0.25em] text-brand-orange font-bold">
+                        SEASON 2026
+                    </span>
+                </div>
+
+                <!-- Main Headline: ONLINE SHOPPING -->
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] text-neutral-900">
+                    ONLINE <br>
+                    <span class="text-brand-orange">SHOPPING</span>
+                </h1>
+
+                <!-- Brand description directly matching reference image -->
+                <p class="text-sm sm:text-base text-neutral-700 leading-relaxed font-normal max-w-md mx-auto lg:mx-0">
+                    Discover compact and premium fashion trends curated for your unique style.
+                </p>
+
+                <!-- Action CTA: SHOP NOW -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="#trending-section"
+                       class="w-full sm:w-auto px-10 py-3.5 bg-neutral-900 hover:bg-brand-orange text-white font-bold text-xs uppercase tracking-[0.2em] rounded-sm transition-all duration-300 shadow-md hover:shadow-lg inline-flex items-center justify-center">
+                        SHOP NOW
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Right Side: Dual Visual Layout Matching Image 1 -->
+            <div class="lg:col-span-7">
+                <div class="grid grid-cols-2 gap-4 sm:gap-6 items-center max-w-lg mx-auto lg:max-w-none">
+                    
+                    <!-- Left Model Card (Smooth Rounded with Dark Studio Backdrop) -->
+                    <div class="overflow-hidden aspect-[3/4] sm:aspect-[4/5] rounded-2xl shadow-xl bg-neutral-900 border border-neutral-200/50 luxury-zoom-container">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop"
+                             alt="MAX VIEW Luxury Fashion Collection"
+                             class="w-full h-full object-cover object-top luxury-zoom-img">
+                    </div>
+
+                    <!-- Right Model Card (Offset Studio Portrait) -->
+                    <div class="overflow-hidden aspect-[3/4] sm:aspect-[4/5] rounded-2xl shadow-xl bg-neutral-900 border border-neutral-200/50 sm:translate-y-4 luxury-zoom-container">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop"
+                             alt="Luxury Menswear"
+                             class="w-full h-full object-cover object-center luxury-zoom-img">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- PAGE 1 — 25% OFF PROMOTIONAL BANNER MATCHING IMAGE 1 -->
+<section class="py-12 lg:py-16 bg-diamond-pattern border-b border-neutral-200/60 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <!-- Left: Pointing Woman on Dark Backdrop -->
+            <div class="lg:col-span-6">
+                <div class="relative overflow-hidden aspect-[16/10] sm:aspect-[16/9] rounded-2xl shadow-2xl bg-neutral-900 border border-neutral-200/40 luxury-zoom-container">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop"
+                         alt="MAX VIEW Exclusive 25% Off Deal"
+                         class="w-full h-full object-cover object-top luxury-zoom-img">
+                </div>
+            </div>
+
+            <!-- Right: 25% OFF Offer Details -->
+            <div class="lg:col-span-6 space-y-4 text-center lg:text-left lg:pl-6">
+                <span class="inline-block text-xs uppercase tracking-[0.25em] text-brand-orange font-bold">
+                    LIMITED TIME OFFER
+                </span>
+
+                <div class="space-y-1">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-900">
+                        MAX VIEW
+                    </h2>
+                    <div class="text-4xl sm:text-5xl lg:text-6xl font-black text-brand-orange tracking-tight">
+                        25% OFF
+                    </div>
+                </div>
+
+                <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal max-w-lg mx-auto lg:mx-0">
+                    Premium fashion collection with massive discounts. Upgrade your style with Max View exclusive offers.
+                </p>
+
+                <div class="pt-2">
+                    <a href="#trending-section"
+                       class="inline-block px-8 py-3 border border-neutral-800 hover:border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white font-semibold text-xs uppercase tracking-wider rounded-md transition-colors shadow-xs">
+                        Explore Details
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- PAGE 1 — TRENDING ARRIVALS (CENTERED HEADER + ORANGE BAR MATCHING IMAGE 1) -->
+<section id="trending-section" class="py-16 lg:py-24 bg-diamond-pattern border-b border-neutral-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Centered Header with Short Orange Bar -->
+        <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-wider uppercase">
+                Trending Arrivals
+            </h2>
+            <div class="w-12 h-1 bg-brand-orange mx-auto mt-3 rounded-full"></div>
+        </div>
+
+
+        <!-- Swipe indicator for mobile devices -->
+        <div class="flex items-center justify-end gap-1.5 text-neutral-400 font-semibold md:hidden mb-3 px-1 text-[11px] uppercase tracking-wider">
+            <span>Swipe</span>
+            <svg class="w-3.5 h-3.5 animate-pulse text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+        </div>
+
+        <!-- Four Product Cards Grid matching Image 1 with Mobile Carousel -->
+        <div class="mobile-cards-carousel md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 lg:gap-8">
+            {% for product in trending_products %}
+                {% include 'components/product_card.html' with product=product link_to_category=True %}
+            {% empty %}
+                <div class="col-span-full py-16 text-center text-neutral-500 bg-white border border-neutral-200 rounded-xl">
+                    <p class="text-base text-neutral-900 font-semibold">No trending products found.</p>
+                    <p class="text-xs mt-1 text-neutral-500">Seed the catalog data using <code class="text-brand-orange">python manage.py seed_data</code>.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- BENEFITS GRID (4 PILLARS MATCHING IMAGE 1) -->
+{% include 'components/benefits_grid.html' %}
+
+{% endblock %}

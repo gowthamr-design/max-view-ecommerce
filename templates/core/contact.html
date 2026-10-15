@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us — MAX VIEW{% endblock %}
+
+{% block content %}
+<!-- PAGE 4 — CONTACT US MATCHING IMAGE 2 -->
+<section class="py-16 lg:py-20 bg-diamond-pattern min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Top Section: 2 Columns Matching Image 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-center mb-20">
+            
+            <!-- Left: Support Team Image with Headsets -->
+            <div class="relative">
+                <div class="aspect-square bg-neutral-900 rounded-sm overflow-hidden border border-neutral-300 shadow-lg luxury-zoom-container">
+                    <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1000&auto=format&fit=crop"
+                         alt="MAX VIEW Customer Support Team"
+                         class="w-full h-full object-cover object-center luxury-zoom-img">
+                </div>
+            </div>
+
+            <!-- Right: Contact Coordinates & Careers Matching Image 2 -->
+            <div class="space-y-6 md:pl-4">
+                
+                <!-- CONTACT US Header with Dash -->
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-light text-neutral-800 uppercase tracking-wider flex items-center gap-3">
+                        <span>CONTACT <strong class="font-bold">US</strong></span>
+                        <span class="w-14 h-px bg-neutral-700 inline-block"></span>
+                    </h1>
+                </div>
+
+                <!-- Our Store Section -->
+                <div class="space-y-1.5 pt-2">
+                    <h2 class="font-bold text-neutral-900 text-sm">Our Store</h2>
+                    <p class="text-xs sm:text-sm text-neutral-600 font-normal leading-relaxed">
+                        123@ Tirupur, Tamilnadu, Old Bus Stand Tirupur, INDIA
+                    </p>
+                    <p class="text-xs sm:text-sm text-neutral-600 font-normal">
+                        Tel: 1234567890 - Email: maxview1@gmail.com
+                    </p>
+                </div>
+
+
+                <!-- Careers at Forever Section -->
+                <div class="space-y-1.5 pt-2">
+                    <h2 class="font-bold text-neutral-900 text-sm">Careers at Forever</h2>
+                    <p class="text-xs sm:text-sm text-neutral-600 font-normal leading-relaxed">
+                        Learn more about our teams and job openings.
+                    </p>
+                    <div class="pt-2">
+                        <a href="mailto:maxview1@gmail.com?subject=Job%20Inquiry%20-%20MAX%20VIEW"
+                           class="inline-block px-6 py-2.5 bg-white border border-neutral-800 hover:bg-neutral-900 hover:text-white text-neutral-900 font-semibold text-xs tracking-wider transition-colors shadow-2xs">
+                            Explore Jobs
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Link/Anchor: Send Us a Message -->
+                <div class="pt-2">
+                    <a href="#message-form" class="font-bold text-neutral-900 hover:text-brand-orange text-sm transition-colors block">
+                        Send Us a Message
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Bottom Section: Centered Send Us a Message Box Matching Image 2 -->
+        <div id="message-form" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-xs p-8 sm:p-12 border border-neutral-200/90 shadow-sm rounded-sm">
+            
+            <h2 class="text-xl sm:text-2xl font-bold text-neutral-900 text-center mb-8">
+                Send Us a Message
+            </h2>
+
+            <form method="POST" action="{% url 'core:contact' %}" class="space-y-5">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-sm">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Your Name Input -->
+                <div>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <p class="text-xs text-red-500 mt-1">{{ form.name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Your Email Input -->
+                <div>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-xs text-red-500 mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Hidden or Optional Subject Input -->
+                {% if form.subject.errors %}
+                    <div>
+                        {{ form.subject }}
+                        <p class="text-xs text-red-500 mt-1">{{ form.subject.errors.0 }}</p>
+                    </div>
+                {% else %}
+                    <div class="hidden">
+                        {{ form.subject }}
+                    </div>
+                {% endif %}
+
+                <!-- Your Message Input -->
+                <div>
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <p class="text-xs text-red-500 mt-1">{{ form.message.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Send Message Button Matching Image 2 -->
+                <div class="pt-2">
+                    <button type="submit"
+                            class="w-full py-3.5 bg-white border border-neutral-900 hover:bg-neutral-900 hover:text-white text-neutral-900 font-semibold text-xs sm:text-sm tracking-wider transition-colors shadow-2xs">
+                        Send Message
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
